@@ -1,0 +1,71 @@
+package com.bit.controller;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.naming.NamingException;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.log4j.Logger;
+
+import com.bit.model.BbsDao;
+import com.bit.model.BbsDto;
+
+@WebServlet("/list/*")
+public class ListController extends HttpServlet {
+	Logger log = Logger.getLogger(this.getClass().getCanonicalName());
+	
+	@Override
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		resp.setCharacterEncoding("utf-8");
+		log.info(req.getRequestURI());
+		String[] uri = req.getRequestURI().split("/");
+		if(uri[uri.length-1].equals("all")) {
+			doAll(req, resp);
+		}else {
+			resp.setCharacterEncoding("utf-8");
+			int cnt = Integer.parseInt(uri[uri.length-1]);
+			log.info(cnt);
+			doCnt(req, resp, cnt);
+		}	
+	}
+	
+	private void doAll(HttpServletRequest req, HttpServletResponse resp) {
+		// TODO Auto-generated method stub
+
+	}
+	
+	private void doCnt(HttpServletRequest req, HttpServletResponse resp, int cnt) throws IOException {
+		try(
+			PrintWriter out = resp.getWriter();
+		) {
+			resp.setContentType("application/json; charset=UTF-8");
+			resp.setCharacterEncoding("utf-8");
+			
+			BbsDao dao = new BbsDao();
+			List<BbsDto> list = dao.getList(cnt);
+			int idx = 0;
+			
+			out.print("{\"lists\":[");
+			for(BbsDto bean:list) {
+				out.print("{\"num\":"+bean.getNum()
+						+ ", \"title\":\""+bean.getTitle()+"\""
+						+ ", \"author\":\""+bean.getAuthor()+"\""
+						+ ", \"date\":\""+bean.getWriteDate().toLocaleString()+"\""
+						+ ", \"view\":"+bean.getViewcnt());
+
+				if(idx++ == list.size()-1 ) out.print("}");
+				else out.print("},");
+			}
+			out.print("]}");
+		} catch (NamingException | SQLException e) {
+			e.printStackTrace();
+		}
+	}
+}

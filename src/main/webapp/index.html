@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="assets/css/reset.css" />
+    <link rel="stylesheet" type="text/css" href="assets/css/basic.css" />
+    <link rel="stylesheet" type="text/css" href="assets/css/reset.css" />
+    <link rel="stylesheet" type="text/css" href="assets/css/index.css" />
+    <link rel="stylesheet" type="text/css" href="assets/css/write.css" />
+    <link rel="stylesheet" type="text/css" href="assets/css/detail.css" />
+    <script type="text/javascript" src="assets/js/jquery-1.12.4.min.js"></script>
+    <title>Board</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="container">
+        <nav>
+          <ul>
+            <li><a href="#">회사소개</a></li>
+            <li><a href="#">인재채용</a></li>
+          </ul>
+          <h1>GOOD_BBS</h1>
+          <ul>
+            <li><a href="#">사회공헌</a></li>
+            <li><a href="#">고객센터</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+    <figure class="bg_set mainBg">
+      <h2>자유게시판</h2>
+    </figure>
+    <main>
+      <section id="detail">
+        <div class="container">
+          <div>
+            <h3 class="after">자유게시판</h3>
+            <strong>누구나 자유롭게 소통을 할 수 있는 공간입니다</strong>
+          </div>
+          <div class="board">
+            <div class="bHead">
+              <h4>게시글 제목</h4>
+              <div class="bottom">
+                <div>
+                  <strong class="btitle">게시일: </strong>
+                  <strong>2023-02-23</strong>
+                </div>
+                <div>
+                  <strong class="btitle">작성자: </strong>
+                  <strong>김민준</strong>
+                </div>
+                <div>
+                  <strong class="btitle">조회수: </strong>
+                  <strong>5</strong>
+                </div>
+              </div>
+            </div>
+            <div class="bBody">
+              <p>
+                안녕하세요
+              </p>
+            </div>
+            <div class="bFoot">
+              <div class="btnBox">
+                <button>수정하기</button>
+                <button>삭제하기</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+    </main>
+  </body>
+
+</html>
+
+<!-- <section id = "bbs">
+  <div class="container">
+    <div>
+      <h3 class="after">자유게시판</h3>
+      <strong>누구나 자유롭게 소통을 할 수 있는 공간입니다</strong>
+    </div>
+    <div id="searchBox">
+      <div class="leftBox">
+        <strong>검색</strong>
+        <div>
+          <input type="date" />
+          <input type="date" />
+        </div>
+      </div>
+      <div class="rightBox">
+        <select>
+          <option>제목</option>
+          <option>내용</option>
+          <option>작성자</option>
+        </select>
+        <input type="search" name="content" />
+        <button>
+          <i class="xi-search"></i>
+        </button>
+      </div>
+    </div>
+    <div class="table">
+      <div class="thead">
+        <ul>
+          <li>게시글 번호</li>
+          <li>제목</li>
+          <li>작성자</li>
+          <li>작성일자</li>
+          <li>조회수</li>
+        </ul>
+      </div>
+      <div class="tbody">
+        <ul class="record">
+          <li><a href="#">1</a></li>
+          <li><a href="#">안녕하세요</a></li>
+          <li><a href="#">김민준</a></li>
+          <li><a href="#">2022.01.08</a></li>
+          <li><a href="#">12</a></li>
+        </ul>
+        <ul class="record">
+          <li><a href="#">1</a></li>
+          <li><a href="#">안녕하세요</a></li>
+          <li><a href="#">김민준</a></li>
+          <li><a href="#">2022.01.08</a></li>
+          <li><a href="#">12</a></li>
+        </ul>
+        <ul class="record">
+          <li><a href="#">1</a></li>
+          <li><a href="#">안녕하세요</a></li>
+          <li><a href="#">김민준</a></li>
+          <li><a href="#">2022.01.08</a></li>
+          <li><a href="#">12</a></li>
+        </ul>
+        <ul class="record">
+          <li><a href="#">1</a></li>
+          <li><a href="#">안녕하세요</a></li>
+          <li><a href="#">김민준</a></li>
+          <li><a href="#">2022.01.08</a></li>
+          <li><a href="#">12</a></li>
+        </ul>
+        <ul class="record">
+          <li><a href="#">1</a></li>
+          <li><a href="#">안녕하세요</a></li>
+          <li><a href="#">김민준</a></li>
+          <li><a href="#">2022.01.08</a></li>
+          <li><a href="#">12</a></li>
+        </ul>
+        <ul class="record">
+          <li><a href="#">1</a></li>
+          <li><a href="#">안녕하세요</a></li>
+          <li><a href="#">김민준</a></li>
+          <li><a href="#">2022.01.08</a></li>
+          <li><a href="#">12</a></li>
+        </ul>
+      </div>
+    </div>
+    <div id="bottomBox">
+      <div id="pagination">
+        <button class="prev">
+          <i class="xi-angle-left"></i>
+        </button>
+        <ul>
+          <li><a href="#">1</a></li>
+          <li><a href="#">2</a></li>
+          <li><a href="#">3</a></li>
+          <li><a href="#">4</a></li>
+          <li><a href="#">5</a></li>
+        </ul>
+        <button class="next">
+          <i class="xi-angle-right"></i>
+        </button>
+      </div>
+      <div class="btnBox">
+        <button>글쓰기</button>
+      </div>
+    </div>
+  </div>
+</section> -->
+
+<!-- writing -->
+<!-- <section id="writing">
+  <div class="container">
+    <div>
+      <h3 class="after">글쓰기</h3>
+    </div>
+    <div class="writeBox">
+      <div class="boxHead">
+        <div class="colBox">
+          <div class="stitle">이름</div>
+          <div>
+            <input id="name" type="text" name="name" />
+          </div>
+        </div>
+        <div class="colBox">
+          <div class="stitle">비밀번호</div>
+          <div>
+            <input id="pwd" type="password" name="pwd" />
+          </div>
+        </div>
+      </div>
+      <div class="boxBody">
+        <div>본문</div>
+        <div>
+          <textarea name="content"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="btnBox">
+      <button>등록하기</button>
+      <button>취소하기</button>
+    </div>
+  </div>
+</section> -->
