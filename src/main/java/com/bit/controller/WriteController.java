@@ -15,13 +15,9 @@ import org.apache.log4j.Logger;
 import com.bit.model.BbsDao;
 import com.bit.model.BbsDto;
 
-@WebServlet("/write.do")
+@WebServlet("/bbs")
 public class WriteController extends HttpServlet {
 	Logger log = Logger.getLogger(this.getClass().getCanonicalName());
-	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		req.getRequestDispatcher("page/write.html").forward(req, resp);
-	}
 	
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -51,7 +47,5 @@ public class WriteController extends HttpServlet {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-
 	}
 }

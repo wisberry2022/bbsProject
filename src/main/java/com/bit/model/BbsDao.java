@@ -13,7 +13,10 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
+import org.apache.log4j.Logger;
+
 public class BbsDao {
+	private Logger log = Logger.getLogger(this.getClass().getCanonicalName());
 	private Connection conn = null;
 	
 	public BbsDao() throws NamingException, SQLException {
@@ -36,8 +39,33 @@ public class BbsDao {
 		}
 	}
 	
+	public BbsDto getOne(int bbsno) throws SQLException {
+		String sql = "select num, title, author, writeDate, content, viewcnt from bbs where num=?";
+		BbsDto bbs = new BbsDto();
+		ResultSet rs = null;
+		
+		try(
+			Connection conn = this.conn;
+			PreparedStatement pstmt = conn.prepareStatement(sql);
+		){
+			pstmt.setInt(1, bbsno);
+			rs = pstmt.executeQuery();
+			if(rs.next()) {
+				bbs.setNum(rs.getInt(1));
+				bbs.setTitle(rs.getString(2));
+				bbs.setAuthor(rs.getString(3));
+				bbs.setWriteDate(rs.getDate(4));
+				bbs.setContent(rs.getString(5));
+				bbs.setViewcnt(rs.getInt(6));
+			}
+		}finally {
+			if(rs != null) rs.close();
+		}
+		return bbs;
+	}
+	
 	public List<BbsDto> getListAll() throws SQLException {
-		String sql = "select num, title, author, writeDate, viewcnt from bbs order by num";
+		String sql = "select num, title, author, writeDate, viewcnt from bbs order by num desc";
 		List<BbsDto> list = new ArrayList<>();
 		
 		try(
@@ -59,7 +87,7 @@ public class BbsDao {
 	}
 	
 	public List<BbsDto> getList(int cnt) throws SQLException {
-		String sql = "select num, title, author, writeDate, viewcnt from bbs order by num limit ?";
+		String sql = "select num, title, author, writeDate, viewcnt from bbs order by num desc limit ?";
 		List<BbsDto> list = new ArrayList<>();
 		ResultSet rs = null;
 		

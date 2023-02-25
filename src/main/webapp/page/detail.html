@@ -12,7 +12,7 @@
     <link rel="stylesheet" type="text/css" href="assets/css/write.css" />
     <link rel="stylesheet" type="text/css" href="assets/css/detail.css" />
     <script type="text/javascript" src="assets/js/lib/jquery-1.12.4.min.js"></script>
-    <script type="text/javascript" src="assets/js/write.js"></script>
+    <script type="text/javascript" src="assets/js/detail.js"></script>
     <title>Board</title>
   </head>
 
@@ -36,52 +36,45 @@
       <h2>자유게시판</h2>
     </figure>
     <main>
-    <section id="writing">
-	  <div class="container">
-	    <div>
-	      <h3 class="after">글쓰기</h3>
-	    </div>
-	    <div class="writeBox">
-	      <div class="boxTop">
-	      	<div class="colBox">
-	      		<div class = "stitle">제목</div>
-	      		<div>
-	      			<input type = "text" name="title" />
-	      		</div>
-	      	</div>
-	      </div>
-	      <div class="boxHead">
-	        <div class="colBox">
-	          <div class="stitle">이름</div>
-	          <div>
-	            <input type="text" name="author" />
-	          </div>
-	        </div>
-	        <div class="colBox">
-	          <div class="stitle">비밀번호</div>
-	          <div>
-	            <input id="pwd" type="password" name="pwd" />
-	          </div>
-	        </div>
-	      </div>
-	      <div class="boxBody">
-	        <div>본문</div>
-	        <div>
-	          <textarea name="content"></textarea>
-	        </div>
-	      </div>
-	    </div>
-	    <div class="btnBox">
-	      <button>등록하기</button>
-	      <button>취소하기</button>
-	    </div>
-	  </div>
-</section> 
+      <section id="detail">
+        <div class="container">
+          <div>
+            <h3 class="after">자유게시판</h3>
+            <strong>누구나 자유롭게 소통을 할 수 있는 공간입니다</strong>
+          </div>
+          <div class="board">
+            <div class="bHead">
+              <h4></h4>
+              <div class="bottom">
+                <div>
+                  <strong class="btitle">게시일: </strong>
+                  <strong></strong>
+                </div>
+                <div>
+                  <strong class="btitle">작성자: </strong>
+                  <strong></strong>
+                </div>
+                <div>
+                  <strong class="btitle">조회수: </strong>
+                  <strong></strong>
+                </div>
+              </div>
+            </div>
+            <div class="bBody">
+              <p>
+<!--             	    data -->
+              </p>
+            </div>
+            <div class="bFoot">
+              <div class="btnBox">
+                <button>수정하기</button>
+                <button>삭제하기</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
   </body>
 
 </html>
-
-
-
-<!-- writing -->

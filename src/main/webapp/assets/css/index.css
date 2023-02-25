@@ -164,7 +164,6 @@ section .container .table>.thead>ul {
   display: flex;
 }
 
-section .container .table>.tbody>.record>li,
 section .container .table>.thead>ul>li {
   padding: 1.5rem 0;
   font-size: 1.5rem;
@@ -189,10 +188,15 @@ section .container .table>.thead>ul>li:first-child {
   width: 10%;
 }
 
-section .container .table>.tbody>.record>li>a {
+section .container .table>.tbody>.record>li>strong {
+  padding: 1.5rem 0;
+  display: block;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
+  font-size: 1.5rem;
+  font-weight: 400;
+  cursor: pointer;
 }
 
 section .container .table>.tbody>.record>li:nth-child(2),

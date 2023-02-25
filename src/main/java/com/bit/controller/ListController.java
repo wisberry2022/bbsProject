@@ -24,14 +24,13 @@ public class ListController extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		resp.setCharacterEncoding("utf-8");
-		log.info(req.getRequestURI());
 		String[] uri = req.getRequestURI().split("/");
 		if(uri[uri.length-1].equals("all")) {
+			resp.setCharacterEncoding("utf-8");
 			doAll(req, resp);
 		}else {
 			resp.setCharacterEncoding("utf-8");
 			int cnt = Integer.parseInt(uri[uri.length-1]);
-			log.info(cnt);
 			doCnt(req, resp, cnt);
 		}	
 	}
@@ -57,7 +56,7 @@ public class ListController extends HttpServlet {
 				out.print("{\"num\":"+bean.getNum()
 						+ ", \"title\":\""+bean.getTitle()+"\""
 						+ ", \"author\":\""+bean.getAuthor()+"\""
-						+ ", \"date\":\""+bean.getWriteDate().toLocaleString()+"\""
+						+ ", \"date\":\""+bean.getWriteDate().toLocalDate()+"\""
 						+ ", \"view\":"+bean.getViewcnt());
 
 				if(idx++ == list.size()-1 ) out.print("}");
