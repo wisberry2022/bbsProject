@@ -1,8 +1,14 @@
 package com.bit.controller;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.URLDecoder;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.naming.NamingException;
 import javax.servlet.ServletException;
@@ -19,6 +25,7 @@ import com.bit.model.BbsDto;
 @WebServlet("/bbs/*")
 public class DetailController extends HttpServlet {
 	Logger log = Logger.getLogger(this.getClass().getCanonicalName());
+	
 	
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -44,6 +51,58 @@ public class DetailController extends HttpServlet {
 			e.printStackTrace();
 		} catch (SQLException e) {
 			e.printStackTrace();
+		}	
+	}
+	
+	@Override
+	protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		Map<String, String> res = new HashMap<>();
+		req.setCharacterEncoding("utf-8");
+		String[] uris = req.getRequestURI().split("/");
+		String[] ends = uris[uris.length-1].split(":");
+		int bbsNo = Integer.parseInt(ends[ends.length-1]);
+		
+		BbsDto bbs = new BbsDto();
+		
+		try(
+			InputStream is = req.getInputStream();
+			InputStreamReader isr = new InputStreamReader(is);
+			BufferedReader br = new BufferedReader(isr);		
+		){
+			String msg = "";
+			String temp = "";
+			while(true) {
+				temp = br.readLine();
+				if(temp == null) break;
+				msg += temp;
+			}
+			
+			String[] datas = msg.split("&");
+			
+			for(String str:datas) {
+				String[] parsed = str.split("=");
+				res.put(parsed[0], URLDecoder.decode(parsed[1], "utf-8"));
+			}
+
+			bbs.setNum(bbsNo);
+			bbs.setTitle(res.get("title"));
+			bbs.setAuthor(res.get("author"));
+			bbs.setPwd(res.get("pwd"));
+			bbs.setContent(res.get("content"));
+			
+			try {
+				BbsDao dao = new BbsDao();
+				if(dao.updateOne(bbs) > 0) {
+					resp.setStatus(resp.SC_OK);
+				};
+			} catch (NamingException e) {
+				resp.setStatus(resp.SC_INTERNAL_SERVER_ERROR);
+				e.printStackTrace();
+			} catch (SQLException e) {
+				resp.setStatus(resp.SC_BAD_REQUEST);
+				e.printStackTrace();
+			}
+			
 		}	
 	}
 }

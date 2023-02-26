@@ -23,18 +23,18 @@ var set = function() {
 		contentType: 'application/json; charset:UTF-8',
 		success: function(data, msg, xhr) {
 			selectShow('detail');
-			var result = data.bbs;
+			updateVal = data.bbs;
 			var dBtm = $('.board').children().eq(0).children().eq(1);
 			var dTitle = $('.board').children().eq(0).children('h4');
 			var dDate = dBtm.children().eq(0).children().eq(1);
 			var dAuthor = dBtm.children().eq(1).children().eq(1);
 			var dView = dBtm.children().eq(2).children().eq(1);
 			var dContent = $('.board').children().eq(1).children(); 
-			dTitle.text(result.title);
-			dDate.text(result.writeDate);
-			dAuthor.text(result.author);
-			dView.text(result.viewcnt);
-			dContent.text(result.content);
+			dTitle.text(updateVal.title);
+			dDate.text(updateVal.writeDate);
+			dAuthor.text(updateVal.author);
+			dView.text(updateVal.viewcnt);
+			dContent.text(updateVal.content);
 		}
 	});
 }
@@ -90,10 +90,20 @@ var updateNo;
 var dBtnBox;
 var updateBtn, delBtn;
 
+// update에 필요한 변수들
+var updateVal;
+// update시 사용했던 input 필드의 값들 초기화하기
+var initialVal = function(...ele) {
+	ele.forEach(function(item, idx){
+		$(item).eq(0).val('');
+	});
+}
+
 
 // modal 관련 변수들
 var modalBox;
 var updateModal;
+var updateParam = {};
 
 $(function(){
 	// 초기 설정
@@ -131,21 +141,40 @@ $(function(){
 	assign.on('click', function(e) {
 		e.preventDefault();
 		var paramObj = getParam(title,author,pwd,content);
-	
-		$.ajax({
-			url:"bbs",
-			method: 'post',
-			data: paramObj,
-			success: function(data, msg, xhr) {
-				selectShow('bbs');
-				tbody.children().remove();
-				getList(10);
-			}
-		});
+		var currentSec = $('#writing').find('.after').text();
+		
+		if(currentSec === '글쓰기'){
+			$.ajax({
+				url:"bbs",
+				method: 'post',
+				data: paramObj,
+				success: function(data, msg, xhr) {
+					selectShow('bbs');
+					tbody.children().remove();
+					getList(10);
+				}
+			});
+		}else if(currentSec === '수정하기'){
+			updateParam = getParam(title, author, pwd, content);
+			$.ajax({
+				url: "bbs/:" + updateNo,
+				method: 'put',
+				contentType: 'text/plain; charset:UTF-8',
+				data: updateParam,
+				success: function(data, msg, xhr) {
+					selectShow('bbs');
+					$('#writing').find('.after').text('글쓰기');
+					initialVal(title, author, pwd, content);
+					tbody.children().remove();
+					getList(10);
+				}
+			});
+		}
 	});
 	
 	// 뒤로가기
 	reset.on('click',function(e) {
+		var currentSec = $('#writing').find('.after').text();
 		e.preventDefault();
 		selectShow('bbs');
 	});
@@ -174,21 +203,48 @@ $(function(){
 	
 	// 확인 버튼 클릭 시 ajax 총신(수정, 삭제)
 	updateModal.find('.uBtm').find('button').on('click', function(){
-		var flag;
-		var pwd = modalBox.find('.uBtm').find('input').eq(0).val();
+		var uPwd = modalBox.find('.uBtm').find('input').eq(0).val();
 		var criteria = $(this).parent().prev().text();
 		if(criteria.includes('수정')) {
-			flag = "put";
 			$.ajax({
 				url:'val',
 				method:'post',
-				data: {num:updateNo, pwd:pwd},
+				data: {num:updateNo, pwd:uPwd},
 				success: function(data, msg, xhr){
-					console.log('success');
+					// 비밀번호 일치 시
+					modalBox.find('.uBtm').find('input').eq(0).val('');
+					$('#modalBox').find('.close').click();
+					selectShow('writing');
+					$('#writing').find('.after').text('수정하기');
+					title.val(updateVal.title);
+					author.val(updateVal.author);
+					pwd.val(uPwd);
+					content.text(updateVal.content);
+				},
+				error: function(xhr){
+					// 비밀번호 미일치 시
+					if(xhr.status === 400){
+						if(modalBox.find('.uBtm').find('.warn').length) {
+							modalBox.find('.uBtm').find('.warn').each(function(idx, ele){
+								$(ele).remove();
+							});
+						}
+						var warn = $('<span/>').addClass('warn').text('비밀번호 미일치');
+						updateModal.find('.uBtm').append(warn);
+						modalBox.find('.uBtm').find('input').eq(0).val('');
+					}	
 				}
 			});
 		}else if(criteria.includes('삭제')){
-			flag = "delete";
+			$.ajax({
+				url:'bbs/:' + updateNo,
+				method: 'delete',
+				success: function(data, msg, xhr){
+					selectShow('bbs');
+					tbody.children().remove();
+					getList(10);
+				}
+			});
 		}else{
 			modalBox.removeClass('active');	
 		}

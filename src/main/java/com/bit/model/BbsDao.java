@@ -34,11 +34,52 @@ public class BbsDao {
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
+	public int updateOne(BbsDto bean) throws SQLException {
+		String sql = "update bbs set title=?, author=?, pwd=AES_ENCRYPT(?, sha2('key', 512)), writeDate=now(), content=? where num=?";
+		
+		try(
+				Connection conn = this.conn;
+				PreparedStatement pstmt = conn.prepareStatement(sql);
+		){
+			pstmt.setString(1, bean.getTitle());
+			pstmt.setString(2, bean.getAuthor());
+			pstmt.setString(3, bean.getPwd());
+			pstmt.setString(4, bean.getContent());
+			pstmt.setInt(5, bean.getNum());
+			return pstmt.executeUpdate();
+		}
+	}
+	
+	// 게시글 비밀번호 일치 여부 확인 메서드
+	public boolean isValid(int num, String pwd) throws SQLException {
+		boolean result;
+		String sql = "select num from bbs where num = ? and pwd = AES_ENCRYPT(?, sha2('key', 512))";
+		ResultSet rs = null;
+		
+		try(
+			Connection conn = this.conn;
+			PreparedStatement pstmt = conn.prepareStatement(sql);
+		){
+			pstmt.setInt(1, num);
+			pstmt.setString(2, pwd);
+			rs = pstmt.executeQuery();
+			
+			if(rs.next()) {
+				result = num == rs.getInt(1) ? true : false;
+			}else {
+				result = false;
+			}
+			
+			if(rs != null) rs.close();
+		}	
+		return result;
+	}
+	
+	// 게시물 번호로 게시글 데이터 받아오는 메서드
 	public BbsDto getOne(int bbsno) throws SQLException {
 		String sql = "select num, title, author, writeDate, content, viewcnt from bbs where num=?";
 		BbsDto bbs = new BbsDto();

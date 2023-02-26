@@ -79,6 +79,14 @@
 	padding: .5rem;
 	width: 8rem;
 	font-size: 1.6rem;
-	
 	background-color: #ddd;
+}
+
+#modalBox>.update>.uBtm .warn {
+	display: block;
+	margin-top: 1.5rem;
+	font-size: 1.3rem;
+	font-weight: 600;
+	color: #ff0000;
+	
 }
