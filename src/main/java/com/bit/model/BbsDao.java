@@ -38,6 +38,21 @@ public class BbsDao {
 		}
 	}
 	
+	public int deleteOne(int bbsNo) throws SQLException {
+		String sql = "delete from bbs where num=?";
+		
+		try(
+				Connection conn = this.conn;
+				PreparedStatement pstmt = conn.prepareStatement(sql);
+		){
+			pstmt.setInt(1, bbsNo);
+			return pstmt.executeUpdate();
+		}
+	}
+	
+
+	
+	// 게시글 수정을 위한 메서드
 	public int updateOne(BbsDto bean) throws SQLException {
 		String sql = "update bbs set title=?, author=?, pwd=AES_ENCRYPT(?, sha2('key', 512)), writeDate=now(), content=? where num=?";
 		
@@ -79,6 +94,18 @@ public class BbsDao {
 		return result;
 	}
 	
+	// 방문자수 증가
+	public void increaseView(int bbsno) throws SQLException {
+		String sql = "update bbs set viewcnt = viewcnt+1 where num=?";
+		
+		try(
+				PreparedStatement pstmt = conn.prepareStatement(sql);
+		){
+			pstmt.setInt(1, bbsno);
+			pstmt.executeUpdate();
+		}
+	}
+	
 	// 게시물 번호로 게시글 데이터 받아오는 메서드
 	public BbsDto getOne(int bbsno) throws SQLException {
 		String sql = "select num, title, author, writeDate, content, viewcnt from bbs where num=?";
@@ -89,6 +116,7 @@ public class BbsDao {
 			Connection conn = this.conn;
 			PreparedStatement pstmt = conn.prepareStatement(sql);
 		){
+			increaseView(bbsno);
 			pstmt.setInt(1, bbsno);
 			rs = pstmt.executeQuery();
 			if(rs.next()) {
@@ -127,8 +155,11 @@ public class BbsDao {
 		return list;
 	}
 	
+	// 게시물 목록 불러오는 함수
 	public List<BbsDto> getList(int cnt) throws SQLException {
-		String sql = "select num, title, author, writeDate, viewcnt from bbs order by num desc limit ?";
+//		select * from bbs order by num desc limit 0, 10;
+//		select * from bbs order by num desc limit 10, 10;
+		String sql = "select num, title, author, writeDate, viewcnt, (select count(*) from bbs) as total from bbs order by num desc limit ?, 10";
 		List<BbsDto> list = new ArrayList<>();
 		ResultSet rs = null;
 		
@@ -145,6 +176,7 @@ public class BbsDao {
 				bean.setAuthor(rs.getString(3));
 				bean.setWriteDate(rs.getDate(4));
 				bean.setViewcnt(rs.getInt(5));
+				bean.setTotal(rs.getInt(6));
 				list.add(bean);
 			}
 			if(rs != null) rs.close();

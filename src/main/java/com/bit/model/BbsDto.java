@@ -3,10 +3,17 @@ package com.bit.model;
 import java.sql.Date;
 
 public class BbsDto {
-	private int num, viewcnt;
+	private int num, viewcnt, total;
 	private String title, author, pwd, content;
 	private Date writeDate;
 	
+	
+	public int getTotal() {
+		return total;
+	}
+	public void setTotal(int total) {
+		this.total = total;
+	}
 	public int getNum() {
 		return num;
 	}
@@ -58,6 +65,7 @@ public class BbsDto {
 		result = prime * result + num;
 		result = prime * result + ((pwd == null) ? 0 : pwd.hashCode());
 		result = prime * result + ((title == null) ? 0 : title.hashCode());
+		result = prime * result + total;
 		result = prime * result + viewcnt;
 		result = prime * result + ((writeDate == null) ? 0 : writeDate.hashCode());
 		return result;
@@ -93,6 +101,8 @@ public class BbsDto {
 				return false;
 		} else if (!title.equals(other.title))
 			return false;
+		if (total != other.total)
+			return false;
 		if (viewcnt != other.viewcnt)
 			return false;
 		if (writeDate == null) {
@@ -104,8 +114,8 @@ public class BbsDto {
 	}
 	@Override
 	public String toString() {
-		return "BbsDto [num=" + num + ", viewcnt=" + viewcnt + ", title=" + title + ", author=" + author + ", pwd="
-				+ pwd + ", content=" + content + ", writeDate=" + writeDate + "]";
+		return "BbsDto [num=" + num + ", viewcnt=" + viewcnt + ", total=" + total + ", title=" + title + ", author="
+				+ author + ", pwd=" + pwd + ", content=" + content + ", writeDate=" + writeDate + "]";
 	}
 	
 	

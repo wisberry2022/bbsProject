@@ -30,6 +30,7 @@ public class ListController extends HttpServlet {
 			doAll(req, resp);
 		}else {
 			resp.setCharacterEncoding("utf-8");
+			resp.setContentType("application/json; charset=UTF-8");
 			int cnt = Integer.parseInt(uri[uri.length-1]);
 			doCnt(req, resp, cnt);
 		}	
@@ -44,9 +45,6 @@ public class ListController extends HttpServlet {
 		try(
 			PrintWriter out = resp.getWriter();
 		) {
-			resp.setContentType("application/json; charset=UTF-8");
-			resp.setCharacterEncoding("utf-8");
-			
 			BbsDao dao = new BbsDao();
 			List<BbsDto> list = dao.getList(cnt);
 			int idx = 0;
@@ -57,8 +55,8 @@ public class ListController extends HttpServlet {
 						+ ", \"title\":\""+bean.getTitle()+"\""
 						+ ", \"author\":\""+bean.getAuthor()+"\""
 						+ ", \"date\":\""+bean.getWriteDate().toLocalDate()+"\""
-						+ ", \"view\":"+bean.getViewcnt());
-
+						+ ", \"view\":"+bean.getViewcnt()
+						+ ", \"total\":"+bean.getTotal());
 				if(idx++ == list.size()-1 ) out.print("}");
 				else out.print("},");
 			}

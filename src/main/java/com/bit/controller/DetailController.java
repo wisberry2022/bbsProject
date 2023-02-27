@@ -55,6 +55,29 @@ public class DetailController extends HttpServlet {
 	}
 	
 	@Override
+	protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		String[] uris = req.getRequestURI().split("/");
+		String[] ends = uris[uris.length-1].split(":");
+		int bbsNo = Integer.parseInt(ends[1]);
+		
+		try {
+			BbsDao dao = new BbsDao();
+			if(dao.deleteOne(bbsNo) > 0) {
+				resp.setStatus(resp.SC_OK);
+			}else {
+				resp.setStatus(resp.SC_BAD_REQUEST);
+			}
+		} catch (NamingException e) {
+			e.printStackTrace();
+			resp.setStatus(resp.SC_INTERNAL_SERVER_ERROR);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			resp.setStatus(resp.SC_INTERNAL_SERVER_ERROR);
+		}
+		
+	}
+	
+	@Override
 	protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		Map<String, String> res = new HashMap<>();
 		req.setCharacterEncoding("utf-8");
@@ -102,7 +125,6 @@ public class DetailController extends HttpServlet {
 				resp.setStatus(resp.SC_BAD_REQUEST);
 				e.printStackTrace();
 			}
-			
 		}	
 	}
 }

@@ -1,7 +1,11 @@
 // index에 필요한 변수들
+var listCnt, startCnt, endCnt, curCnt, totalPageCnt;
+curCnt = 1;
 var goWrite, dBtn;
 var cnt;
+cnt = (curCnt-1) * 10;
 var tbody;
+var prev, nxt, pul;
 var sArr = [];
 // 원하는 섹션만 보여주는 함수
 var selectShow = function(idName) {
@@ -39,13 +43,22 @@ var set = function() {
 	});
 }
 
+var goPage = function(e) {
+	curCnt = $(e.target).text();
+	cnt = (curCnt-1)*10;
+	tbody.children().remove();
+	getList(cnt, 'none');
+}
+
 // 게시글 목록 가져오는 함수
-var getList = function(cnt) {
+var getList = function(cnt, flag) {
 	$.ajax({
 		url: 'list/' + cnt,
 		method: 'get',
 		contentType: "application/json; charset:UTF-8",
 		success: function(data, msg, xhr) {
+			listCnt = data.lists[0].total;
+			totalPageCnt = Math.ceil(listCnt/10);
 			$(data.lists).each(function(idx, ele){
 				var record = $('<ul/>').addClass('record');
 				record
@@ -66,6 +79,17 @@ var getList = function(cnt) {
 										  						.on('click', set)));
 				tbody.append(record);
 			});
+			
+			endCnt = curCnt + 5 > totalPageCnt ? totalPageCnt : curCnt+5; 
+			
+			if(flag === 'first'){
+				for(var i = curCnt; i<=endCnt; i++){
+					var numBtn = $('<strong/>').text(i);
+					var li = $('<li/>').append(numBtn)
+									   .on('click', goPage);
+					pul.append(li);							
+				}			
+			}
 		}
 	});
 }
@@ -90,7 +114,7 @@ var updateNo;
 var dBtnBox;
 var updateBtn, delBtn;
 
-// update에 필요한 변수들
+// update&delete에 필요한 변수들
 var updateVal;
 // update시 사용했던 input 필드의 값들 초기화하기
 var initialVal = function(...ele) {
@@ -99,11 +123,18 @@ var initialVal = function(...ele) {
 	});
 }
 
-
 // modal 관련 변수들
 var modalBox;
 var updateModal;
 var updateParam = {};
+// 비밀번호 미일 치 시 등장하는 경고창 없에는 함수 
+var initialWarn = function() {
+	if(modalBox.find('.uBtm').find('.warn').length) {
+		modalBox.find('.uBtm').find('.warn').each(function(_, ele){
+			$(ele).remove();
+		});
+	}
+}
 
 $(function(){
 	// 초기 설정
@@ -116,6 +147,31 @@ $(function(){
 	selectShow('bbs');
 	
 	// index에서 사용되는 JS
+	prev = $('#pagination>.prev');
+	nxt = $('#pagination>.next');
+	pul = $('#pagination>ul');
+	
+	// 이전버튼
+	prev.on('click', function(){
+		if(curCnt != 1) {
+			curCnt -= 1;
+			cnt = (curCnt-1)*10;
+			tbody.children().remove();
+			getList(cnt, 'none');
+		}  
+	});
+	
+	// 다음버튼
+	nxt.on('click', function(){
+		if(curCnt != totalPageCnt) {
+			curCnt += 1;
+			cnt = (curCnt-1)*10;
+			tbody.children().remove();
+			getList(cnt, 'none');
+		}
+	});
+	
+	
 	goWrite = $('#bbs').find('.btnBox').children();
 	goWrite.on('click', function(e){
 		history.pushState({link:'write'}, "", location.href);
@@ -123,7 +179,8 @@ $(function(){
 	});
 	tbody = $('#bbs').find('.table').find('.tbody');
 	
-	getList(10);
+	// 사이트 접속 시, 게시물 리스트 받아오기
+	getList(cnt, 'first');
 	
 	// write에서 사용되는 JS	
 	assign = $('#writing .btnBox').children().eq(0);
@@ -151,7 +208,8 @@ $(function(){
 				success: function(data, msg, xhr) {
 					selectShow('bbs');
 					tbody.children().remove();
-					getList(10);
+					getList(0, 'none');
+					initialVal(title, author, pwd, content);
 				}
 			});
 		}else if(currentSec === '수정하기'){
@@ -166,7 +224,7 @@ $(function(){
 					$('#writing').find('.after').text('글쓰기');
 					initialVal(title, author, pwd, content);
 					tbody.children().remove();
-					getList(10);
+					getList(0, 'none');
 				}
 			});
 		}
@@ -211,7 +269,7 @@ $(function(){
 				method:'post',
 				data: {num:updateNo, pwd:uPwd},
 				success: function(data, msg, xhr){
-					// 비밀번호 일치 시
+					// 수정 모달 - 비밀번호 일치 시
 					modalBox.find('.uBtm').find('input').eq(0).val('');
 					$('#modalBox').find('.close').click();
 					selectShow('writing');
@@ -222,13 +280,9 @@ $(function(){
 					content.text(updateVal.content);
 				},
 				error: function(xhr){
-					// 비밀번호 미일치 시
+					// 수정 모달 - 비밀번호 미일치 시
 					if(xhr.status === 400){
-						if(modalBox.find('.uBtm').find('.warn').length) {
-							modalBox.find('.uBtm').find('.warn').each(function(idx, ele){
-								$(ele).remove();
-							});
-						}
+						initialWarn();
 						var warn = $('<span/>').addClass('warn').text('비밀번호 미일치');
 						updateModal.find('.uBtm').append(warn);
 						modalBox.find('.uBtm').find('input').eq(0).val('');
@@ -237,14 +291,34 @@ $(function(){
 			});
 		}else if(criteria.includes('삭제')){
 			$.ajax({
-				url:'bbs/:' + updateNo,
-				method: 'delete',
+				url:'val',
+				method:'post',
+				data: {num:updateNo, pwd:uPwd},
 				success: function(data, msg, xhr){
-					selectShow('bbs');
-					tbody.children().remove();
-					getList(10);
+					// 삭제 모달  - 비밀번호 일치 시
+					$.ajax({
+						url:'bbs/:' + updateNo,
+						method: 'delete',
+						success: function(data, msg, xhr){
+							selectShow('bbs');
+							tbody.children().remove();
+							getList(0, 'none');
+							$('#modalBox').find('.close').click();
+							modalBox.find('.uBtm').find('input').eq(0).val('');
+						}
+					});
+				},
+				error: function(xhr){
+					// 삭제 모달  - 비밀번호 미일치 시
+					if(xhr.status === 400){
+						initialWarn();
+						var warn = $('<span/>').addClass('warn').text('비밀번호 미일치');
+						updateModal.find('.uBtm').append(warn);
+						modalBox.find('.uBtm').find('input').eq(0).val('');
+					}						
 				}
 			});
+			
 		}else{
 			modalBox.removeClass('active');	
 		}
