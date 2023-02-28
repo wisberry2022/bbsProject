@@ -251,6 +251,11 @@ section .container .table>.thead>ul>li:last-child {
   gap: .5rem;
 }
 
+#pagination>ul>li.current {
+	background-color: #ff2e16;
+	color: #fff;
+}
+
 #pagination>ul>li>strong {
   border: .1rem solid #d9d9d9;
   display: block;

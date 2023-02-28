@@ -1,16 +1,27 @@
+// history stack을 위한 변수들
+var pageCursor;
+
+
 // index에 필요한 변수들
 var listCnt, startCnt, endCnt, curCnt, totalPageCnt;
-curCnt = 1;
+curCnt = 0;
+startCnt = curCnt;
 var goWrite, dBtn;
 var cnt;
-cnt = (curCnt-1) * 10;
+cnt = curCnt * 10;
 var tbody;
 var prev, nxt, pul;
 var sArr = [];
-// 원하는 섹션만 보여주는 함수
-var selectShow = function(idName) {
+
+// 원하는 섹션만 보여주는 함수(히스토리 스택에 쌓이는 함수)
+var selectShow = function(idName, isStack) {
 	sArr.forEach(function(ele){
-		if(ele.attr('id') === idName) ele.show();
+		if(ele.attr('id') === idName) {
+			if(isStack){
+				history.pushState({link:idName}, "", "#"+idName);
+			}
+			ele.show();
+		}
 		else ele.hide();
 	});
 }
@@ -26,7 +37,7 @@ var set = function() {
 		method: 'get',
 		contentType: 'application/json; charset:UTF-8',
 		success: function(data, msg, xhr) {
-			selectShow('detail');
+			selectShow('detail', true);
 			updateVal = data.bbs;
 			var dBtm = $('.board').children().eq(0).children().eq(1);
 			var dTitle = $('.board').children().eq(0).children('h4');
@@ -43,11 +54,24 @@ var set = function() {
 	});
 }
 
+// 숫자버튼 누를 시 해당 페이지의 게시글 가져오는 함수
 var goPage = function(e) {
-	curCnt = $(e.target).text();
-	cnt = (curCnt-1)*10;
+	curCnt = Number.parseInt($(e.target).text())-1;
+	cnt = curCnt*10;
+	changeBtnColor(curCnt);
 	tbody.children().remove();
-	getList(cnt, 'none');
+	getList(cnt, false);
+}
+
+// prev, next 버튼 클릭 시 버튼 컬러 변경 함수
+var changeBtnColor = function(tidx){
+	pul.children().each(function(idx, ele){
+		target = Number.parseInt($(ele).children().eq(0).text())-1;
+		if(target === tidx) {
+			$(ele).addClass('current');
+		}
+		else $(ele).removeClass('current');
+	});
 }
 
 // 게시글 목록 가져오는 함수
@@ -80,20 +104,25 @@ var getList = function(cnt, flag) {
 				tbody.append(record);
 			});
 			
-			endCnt = curCnt + 5 > totalPageCnt ? totalPageCnt : curCnt+5; 
+			endCnt = startCnt + 5 > totalPageCnt ? totalPageCnt : startCnt+5; 
 			
-			if(flag === 'first'){
-				for(var i = curCnt; i<=endCnt; i++){
-					var numBtn = $('<strong/>').text(i);
+			// 페이지네이션 번호 생성
+			if(flag){
+				if(['rebuild','reverse'].includes(flag)) {
+					pul.children().remove();
+				}	
+				for(var i = startCnt; i<endCnt; i++){
+					var numBtn = $('<strong/>').text(i+1);
 					var li = $('<li/>').append(numBtn)
 									   .on('click', goPage);
 					pul.append(li);							
 				}			
+				if(['rebuild','first'].includes(flag)) pul.children().eq(0).addClass('current');
+				if('reverse' === flag) pul.children().last().addClass('current');
 			}
 		}
 	});
 }
-
 
 // write에 필요한 변수들
 var arr = [];
@@ -137,6 +166,12 @@ var initialWarn = function() {
 }
 
 $(function(){
+	// 뒤로가기&앞으로가기
+	onpopstate = function(e) {
+		pageCursor = location.href.split("#")[1];
+		selectShow(pageCursor, false);
+	}
+
 	// 초기 설정
 	modalBox = $('#modalBox');
 	updateModal = modalBox.children().eq(0);
@@ -144,7 +179,8 @@ $(function(){
 	$('section').each(function(idx,ele) {
 		sArr.push($(ele));
 	});
-	selectShow('bbs');
+	
+	selectShow('bbs', true);
 	
 	// index에서 사용되는 JS
 	prev = $('#pagination>.prev');
@@ -153,29 +189,38 @@ $(function(){
 	
 	// 이전버튼
 	prev.on('click', function(){
-		if(curCnt != 1) {
+		if(curCnt != 0) {
 			curCnt -= 1;
-			cnt = (curCnt-1)*10;
+			cnt = curCnt*10;
+			changeBtnColor(curCnt);
 			tbody.children().remove();
-			getList(cnt, 'none');
+			if(curCnt % 5 == 4) {
+				startCnt-=5;
+				getList(cnt, 'reverse');
+			}
+			else getList(cnt, false);
 		}  
 	});
 	
 	// 다음버튼
 	nxt.on('click', function(){
-		if(curCnt != totalPageCnt) {
+		if(curCnt != totalPageCnt-1) {
 			curCnt += 1;
-			cnt = (curCnt-1)*10;
+			cnt = curCnt*10;
+			changeBtnColor(curCnt);
 			tbody.children().remove();
-			getList(cnt, 'none');
+			if(curCnt % 5 == 0) {
+				startCnt+=5;
+				getList(cnt, 'rebuild');
+			}
+			else getList(cnt, false);
 		}
 	});
 	
 	
 	goWrite = $('#bbs').find('.btnBox').children();
 	goWrite.on('click', function(e){
-		history.pushState({link:'write'}, "", location.href);
-		selectShow('writing');
+		selectShow('writing', true);
 	});
 	tbody = $('#bbs').find('.table').find('.tbody');
 	
@@ -206,9 +251,9 @@ $(function(){
 				method: 'post',
 				data: paramObj,
 				success: function(data, msg, xhr) {
-					selectShow('bbs');
+					selectShow('bbs', true);
 					tbody.children().remove();
-					getList(0, 'none');
+					getList(0, 'rebuild');
 					initialVal(title, author, pwd, content);
 				}
 			});
@@ -220,21 +265,23 @@ $(function(){
 				contentType: 'text/plain; charset:UTF-8',
 				data: updateParam,
 				success: function(data, msg, xhr) {
-					selectShow('bbs');
+					selectShow('bbs', true);
 					$('#writing').find('.after').text('글쓰기');
 					initialVal(title, author, pwd, content);
 					tbody.children().remove();
-					getList(0, 'none');
+					getList(0, false);
 				}
 			});
 		}
 	});
 	
-	// 뒤로가기
+	// 취소버튼
 	reset.on('click',function(e) {
 		var currentSec = $('#writing').find('.after').text();
 		e.preventDefault();
-		selectShow('bbs');
+		selectShow('bbs', false);
+		initialVal(title, author, pwd, content);
+		if(currentSec === '수정하기') $('#writing').find('.after').text('글쓰기'); 
 	});
 	
 	// detail에서 사용되는 JS
@@ -256,6 +303,7 @@ $(function(){
 		$(ele).on('click', function(e){
 			modalBox.removeClass('active');
 			modalBox.find('.uBtm').find('input').eq(0).val('');
+			initialWarn();
 		});
 	});
 	
@@ -272,7 +320,7 @@ $(function(){
 					// 수정 모달 - 비밀번호 일치 시
 					modalBox.find('.uBtm').find('input').eq(0).val('');
 					$('#modalBox').find('.close').click();
-					selectShow('writing');
+					selectShow('writing', false);
 					$('#writing').find('.after').text('수정하기');
 					title.val(updateVal.title);
 					author.val(updateVal.author);
@@ -300,9 +348,9 @@ $(function(){
 						url:'bbs/:' + updateNo,
 						method: 'delete',
 						success: function(data, msg, xhr){
-							selectShow('bbs');
+							selectShow('bbs', true);
 							tbody.children().remove();
-							getList(0, 'none');
+							getList(0, false);
 							$('#modalBox').find('.close').click();
 							modalBox.find('.uBtm').find('input').eq(0).val('');
 						}
