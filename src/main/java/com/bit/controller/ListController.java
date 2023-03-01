@@ -33,6 +33,7 @@ public class ListController extends HttpServlet {
 		}else {
 			resp.setCharacterEncoding("utf-8");
 			resp.setContentType("application/json; charset=UTF-8");
+			resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
 			resp.setHeader("Access-Control-Allow-Origin", "*");
 			int cnt = Integer.parseInt(uri[uri.length-1]);
 			doCnt(req, resp, cnt);

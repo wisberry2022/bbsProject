@@ -111,7 +111,7 @@ var getList = function (cnt, flag) {
   $.ajax({
     url: 'list/' + cnt,
     method: 'get',
-    contentType: "application/json; charset:UTF-8",
+    contentType: "application/json; charset=UTF-8",
     crossDomain: true,
     success: function (data, msg, xhr) {
       listCnt = data.lists[0].total;
