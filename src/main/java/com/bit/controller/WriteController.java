@@ -21,6 +21,7 @@ public class WriteController extends HttpServlet {
 	
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		resp.setHeader("Access-Control-Allow-Origin", "*");
 		BbsDto bean = new BbsDto();
 		String author = req.getParameter("author");
 		String pwd = req.getParameter("pwd");

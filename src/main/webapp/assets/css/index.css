@@ -100,6 +100,13 @@ section .container>div strong {
   background-color: #f9f9f9;
 }
 
+#searchBox .warn {
+	font-size: 1.5rem;
+	font-weight: 600;
+	color: #ff0000;
+	line-height: 4rem;
+}
+
 #searchBox .leftBox,
 #searchBox .rightBox {
   display: flex;

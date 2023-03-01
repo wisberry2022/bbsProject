@@ -6,7 +6,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -38,6 +41,99 @@ public class BbsDao {
 		}
 	}
 	
+	
+	public String dateQuery() {
+		return "writeDate between ? and ? AND ";
+	}
+	
+	
+
+	// 게시글 검색을 위한 메서드
+	public List<BbsDto> search(Map<String, String> qsMap) throws SQLException {
+		List<BbsDto> list = new ArrayList<>();
+		Boolean dateFlag = false;
+		
+		String sql = "select num, title, author, writeDate, viewcnt from bbs where ";
+		
+		String sqlSuffix = "order by num desc limit ?,10";
+		ResultSet rs = null;
+		
+		List<String> keySet = new ArrayList<>();
+		Set<String> keys = qsMap.keySet();
+		Iterator<String> ite = keys.iterator();
+		while(ite.hasNext()) {
+			String key = ite.next();
+			keySet.add(key);
+		}
+		
+//		log.info(keySet);
+		
+		if(keySet.contains("eDate") && keySet.contains("sDate")) {
+			String sql2 = "select num, title, author, writeDate, viewcnt, ";
+			String ssql = "(select count(*) from bbs where writeDate between ? and ? AND "+ qsMap.get(keySet.get(4)) +" like ?) as total ";
+			sql2 += ssql + "from bbs where ";
+			sql2 += dateQuery();
+			sql2 += qsMap.get(keySet.get(4)) +" Like ? " + sqlSuffix;
+			try(
+					Connection conn = this.conn;
+					PreparedStatement pstmt = conn.prepareStatement(sql2);
+			){
+					pstmt.setString(1, qsMap.get(keySet.get(1)));
+					pstmt.setString(2, qsMap.get(keySet.get(3)));
+					pstmt.setString(3, "%"+ qsMap.get(keySet.get(0)) +"%");
+					pstmt.setString(4, qsMap.get(keySet.get(1)));
+					pstmt.setString(5, qsMap.get(keySet.get(3)));
+					pstmt.setString(6, "%" + qsMap.get(keySet.get(0)) + "%");
+					pstmt.setInt(7, Integer.parseInt(qsMap.get(keySet.get(2))));
+					rs = pstmt.executeQuery();
+					while(rs.next()) {
+						BbsDto bean = new BbsDto();
+						
+						bean.setNum(rs.getInt(1));
+						bean.setTitle(rs.getString(2));
+						bean.setAuthor(rs.getString(3));
+						bean.setWriteDate(rs.getDate(4));
+						bean.setViewcnt(rs.getInt(5));
+						bean.setTotal(rs.getInt(6));
+						
+						list.add(bean);
+					}
+					
+					return list;
+			}	
+		}else {
+			sql += qsMap.get(keySet.get(2))+" Like ? " + sqlSuffix;
+			try(
+					Connection conn = this.conn;
+					PreparedStatement pstmt = conn.prepareStatement(sql);
+			){
+				log.info(sql);
+				pstmt.setString(1, "%" + qsMap.get(keySet.get(0)) + "%");
+				pstmt.setInt(2, Integer.parseInt(qsMap.get(keySet.get(1))));
+				
+				rs = pstmt.executeQuery();
+				
+				while(rs.next()) {
+					BbsDto bean = new BbsDto();
+					
+					bean.setNum(rs.getInt(1));
+					bean.setTitle(rs.getString(2));
+					bean.setAuthor(rs.getString(3));
+					bean.setWriteDate(rs.getDate(4));
+					bean.setViewcnt(rs.getInt(5));
+					
+					list.add(bean);
+				}
+				
+				return list;		
+			}
+		}
+
+		
+	}
+	
+	
+	// 게시글 삭제를 위한 메서드
 	public int deleteOne(int bbsNo) throws SQLException {
 		String sql = "delete from bbs where num=?";
 		

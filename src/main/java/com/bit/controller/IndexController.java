@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 public class IndexController extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		resp.setHeader("Access-Control-Allow-Origin", "*");
 		String root = req.getContextPath();
 		req.getRequestDispatcher("page/index.html").forward(req, resp);
 	}

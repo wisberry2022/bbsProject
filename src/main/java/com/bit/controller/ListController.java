@@ -23,6 +23,8 @@ public class ListController extends HttpServlet {
 	
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		resp.setHeader("Access-Control-Allow-Origin", "*");
+		
 		resp.setCharacterEncoding("utf-8");
 		String[] uri = req.getRequestURI().split("/");
 		if(uri[uri.length-1].equals("all")) {
@@ -31,6 +33,7 @@ public class ListController extends HttpServlet {
 		}else {
 			resp.setCharacterEncoding("utf-8");
 			resp.setContentType("application/json; charset=UTF-8");
+			resp.setHeader("Access-Control-Allow-Origin", "*");
 			int cnt = Integer.parseInt(uri[uri.length-1]);
 			doCnt(req, resp, cnt);
 		}	
@@ -61,6 +64,8 @@ public class ListController extends HttpServlet {
 				else out.print("},");
 			}
 			out.print("]}");
+			
+			
 		} catch (NamingException | SQLException e) {
 			e.printStackTrace();
 		}

@@ -19,6 +19,7 @@ public class ValController extends HttpServlet {
 	Logger log = Logger.getLogger(this.getClass().getCanonicalName());
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		resp.setHeader("Access-Control-Allow-Origin", "*");
 		int num = Integer.parseInt(req.getParameter("num"));
 		String pwd = req.getParameter("pwd");
 		
