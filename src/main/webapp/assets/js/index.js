@@ -33,34 +33,6 @@ var selectShow = function (idName, isStack) {
   });
 }
 
-// 선택한 게시글을 가져오는 함수
-var set = function () {
-  var row = $(this).parent().parent();
-  var bbsNum = row.children().eq(0).children().text();
-  updateNo = bbsNum;
-
-  $.ajax({
-    url: 'bbs/:' + bbsNum,
-    method: 'get',
-    contentType: 'application/json; charset:UTF-8',
-    success: function (data, msg, xhr) {
-      selectShow('detail', true);
-      updateVal = data.bbs;
-      var dBtm = $('.board').children().eq(0).children().eq(1);
-      var dTitle = $('.board').children().eq(0).children('h4');
-      var dDate = dBtm.children().eq(0).children().eq(1);
-      var dAuthor = dBtm.children().eq(1).children().eq(1);
-      var dView = dBtm.children().eq(2).children().eq(1);
-      var dContent = $('.board').children().eq(1).children();
-      dTitle.text(updateVal.title);
-      dDate.text(updateVal.writeDate);
-      dAuthor.text(updateVal.author);
-      dView.text(updateVal.viewcnt);
-      dContent.text(updateVal.content);
-    }
-  });
-}
-
 // 숫자버튼 누를 시 해당 페이지의 게시글 가져오는 함수
 var goPage = function (e) {
   curCnt = Number.parseInt($(e.target).text()) - 1;
@@ -105,13 +77,41 @@ var pagination = function (flag) {
   }
 }
 
+// 선택한 게시글을 가져오는 함수
+var set = function () {
+  //var row = $(this).parent().parent();
+  //var bbsNum = row.children().eq(0).children().text();
+  var bbsNum = $(this).children().eq(0).children().text();
+  updateNo = bbsNum;
+
+  $.ajax({
+    url: 'http://localhost:8080/Board/bbs/:' + bbsNum,
+    method: 'get',
+    // contentType: 'application/json; charset:UTF-8',
+    success: function (data, msg, xhr) {
+      selectShow('detail', true);
+      updateVal = data.bbs;
+      var dBtm = $('.board').children().eq(0).children().eq(1);
+      var dTitle = $('.board').children().eq(0).children('h4');
+      var dDate = dBtm.children().eq(0).children().eq(1);
+      var dAuthor = dBtm.children().eq(1).children().eq(1);
+      var dView = dBtm.children().eq(2).children().eq(1);
+      var dContent = $('.board').children().eq(1).children();
+      dTitle.text(updateVal.title);
+      dDate.text(updateVal.writeDate);
+      dAuthor.text(updateVal.author);
+      dView.text(updateVal.viewcnt);
+      dContent.text(updateVal.content);
+    }
+  });
+}
 
 // 게시글 목록 가져오는 함수
 var getList = function (cnt, flag) {
   $.ajax({
-    url: 'list/' + cnt,
+    url: 'http://localhost:8080/Board/list/' + cnt,
     method: 'get',
-    contentType: "application/json; charset=UTF-8",
+    // contentType: "application/json; charset=UTF-8",
     crossDomain: true,
     success: function (data, msg, xhr) {
       listCnt = data.lists[0].total;
@@ -119,21 +119,17 @@ var getList = function (cnt, flag) {
       $(data.lists).each(function (idx, ele) {
         var record = $('<ul/>').addClass('record');
         record
+          .on('click', set)
           .append($('<li/>')
-            .append($('<strong/>').text(ele.num)
-              .on('click', set)))
+            .append($('<strong/>').text(ele.num)))
           .append($('<li/>')
-            .append($('<strong/>').text(ele.title)
-              .on('click', set)))
+            .append($('<strong/>').text(ele.title)))
           .append($('<li/>')
-            .append($('<strong/>').text(ele.author)
-              .on('click', set)))
+            .append($('<strong/>').text(ele.author)))
           .append($('<li/>')
-            .append($('<strong/>').text(ele.date)
-              .on('click', set)))
+            .append($('<strong/>').text(ele.date)))
           .append($('<li/>')
-            .append($('<strong/>').text(ele.view)
-              .on('click', set)));
+            .append($('<strong/>').text(ele.view)));
         tbody.append(record);
       });
 
@@ -208,7 +204,6 @@ $(function () {
   selectShow('bbs', true);
 
   // 검색 기능에서 사용되는 JS
-
   searchBox = $('#searchBox');
   sDate = searchBox.children('.leftBox').children().eq(1).children().eq(0);
   eDate = sDate.next();
@@ -249,9 +244,9 @@ $(function () {
     var qS = $.param(searchObj).replace(/&/g, "$");
 
     $.ajax({
-      url: 'bbs/search?cnt=' + (curCnt ? curCnt * 10 : 0) + '$' + qS,
+      url: 'http://localhost:8080/Board/bbs/search?cnt=' + (curCnt ? curCnt * 10 : 0) + '$' + qS,
       method: 'get',
-      contentType: 'application/json; charset:UTF-8',
+      // contentType: 'application/json; charset:UTF-8',
       success: function (data, msg, xhr) {
         listCnt = data.result[0].total;
         totalPageCnt = Math.ceil(listCnt / 10);
@@ -260,21 +255,17 @@ $(function () {
         $(data.result).each(function (idx, ele) {
           var record = $('<ul/>').addClass('record');
           record
+            .on('click', set)
             .append($('<li/>')
-              .append($('<strong/>').text(ele.num)
-                .on('click', set)))
+              .append($('<strong/>').text(ele.num)))
             .append($('<li/>')
-              .append($('<strong/>').text(ele.title)
-                .on('click', set)))
+              .append($('<strong/>').text(ele.title)))
             .append($('<li/>')
-              .append($('<strong/>').text(ele.author)
-                .on('click', set)))
+              .append($('<strong/>').text(ele.author)))
             .append($('<li/>')
-              .append($('<strong/>').text(ele.writeDate)
-                .on('click', set)))
+              .append($('<strong/>').text(ele.writeDate)))
             .append($('<li/>')
-              .append($('<strong/>').text(ele.viewcnt)
-                .on('click', set)));
+              .append($('<strong/>').text(ele.viewcnt)));
           tbody.append(record);
           endCnt = startCnt + 5 > totalPageCnt ? totalPageCnt : startCnt + 5;
           pagination("rebuild");
@@ -358,7 +349,7 @@ $(function () {
 
     if (currentSec === '글쓰기') {
       $.ajax({
-        url: "bbs",
+        url: "http://localhost:8080/Board/bbs",
         method: 'post',
         data: paramObj,
         success: function (data, msg, xhr) {
@@ -371,16 +362,20 @@ $(function () {
     } else if (currentSec === '수정하기') {
       updateParam = getParam(title, author, pwd, content);
       $.ajax({
-        url: "bbs/:" + updateNo,
+        url: "http://localhost:8080/Board/bbs/:" + updateNo,
         method: 'put',
-        contentType: 'text/plain; charset:UTF-8',
+        contentType: 'application/json; charset=UTF-8',
         data: updateParam,
         success: function (data, msg, xhr) {
+          console.log('성공!@');
           selectShow('bbs', true);
           $('#writing').find('.after').text('글쓰기');
           initialVal(title, author, pwd, content);
           tbody.children().remove();
           getList(0, false);
+        },
+        error: function (data, msg, xhr) {
+          console.log(data, msg, xhr);
         }
       });
     }
@@ -424,11 +419,12 @@ $(function () {
     var criteria = $(this).parent().prev().text();
     if (criteria.includes('수정')) {
       $.ajax({
-        url: 'val',
+        url: 'http://localhost:8080/Board/val',
         method: 'post',
         data: { num: updateNo, pwd: uPwd },
         success: function (data, msg, xhr) {
           // 수정 모달 - 비밀번호 일치 시
+          console.log("수정 모달에서 넘어감 ", updateVal);
           modalBox.find('.uBtm').find('input').eq(0).val('');
           $('#modalBox').find('.close').click();
           selectShow('writing', false);
@@ -436,7 +432,8 @@ $(function () {
           title.val(updateVal.title);
           author.val(updateVal.author);
           pwd.val(uPwd);
-          content.text(updateVal.content);
+          content.val(updateVal.content);
+          console.log('수정 모달에서의 content', content);
         },
         error: function (xhr) {
           // 수정 모달 - 비밀번호 미일치 시
@@ -450,13 +447,13 @@ $(function () {
       });
     } else if (criteria.includes('삭제')) {
       $.ajax({
-        url: 'val',
+        url: 'http://localhost:8080/Board/val',
         method: 'post',
         data: { num: updateNo, pwd: uPwd },
         success: function (data, msg, xhr) {
           // 삭제 모달  - 비밀번호 일치 시
           $.ajax({
-            url: 'bbs/:' + updateNo,
+            url: 'http://localhost:8080/Board/bbs/:' + updateNo,
             method: 'delete',
             success: function (data, msg, xhr) {
               selectShow('bbs', true);

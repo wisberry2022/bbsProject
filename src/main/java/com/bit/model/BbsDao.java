@@ -11,21 +11,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
+
+import com.mysql.cj.jdbc.MysqlDataSource;
 
 public class BbsDao {
 	private Logger log = Logger.getLogger(this.getClass().getCanonicalName());
 	private Connection conn = null;
 	
 	public BbsDao() throws NamingException, SQLException {
-		Context initContext = new InitialContext();
-		Context envContext  = (Context)initContext.lookup("java:/comp/env");
-		DataSource ds = (DataSource)envContext.lookup("jdbc/bbsDB");
+//		Context initContext = new InitialContext();
+//		Context envContext  = (Context)initContext.lookup("java:/comp/env");
+//		DataSource ds = (DataSource)envContext.lookup("jdbc/bbsDB");
+		MysqlDataSource ds = new MysqlDataSource();
+		ds.setURL("jdbc:mysql://localhost:3306/bbsproject");
+		ds.setUser("scott");
+		ds.setPassword("tiger");
 		conn = ds.getConnection();
 	}
 	

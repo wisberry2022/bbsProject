@@ -30,6 +30,8 @@ public class DetailController extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		resp.setHeader("Access-Control-Allow-Origin", "*");
+		resp.setHeader("Access-Control-Allow-Credentials", "true");
+		resp.setHeader("Access-Control-Allow-Methods", "*");
 		resp.setContentType("application/json; charset=UTF-8");
 		req.setCharacterEncoding("utf-8");
 		BbsDto bbs = new BbsDto();
@@ -94,6 +96,8 @@ public class DetailController extends HttpServlet {
 	@Override
 	protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		resp.setHeader("Access-Control-Allow-Origin", "*");
+		resp.setHeader("Access-Control-Allow-Methods", "*");
+		log.info("delete 요청 들어옴");
 		String[] uris = req.getRequestURI().split("/");
 		String[] ends = uris[uris.length-1].split(":");
 		int bbsNo = Integer.parseInt(ends[1]);
@@ -116,8 +120,14 @@ public class DetailController extends HttpServlet {
 	}
 	
 	@Override
-	protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		resp.setHeader("Access-Control-Allow-Origin", "*");
+		resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
+		resp.setHeader("Access-Control-Allow-Methods", "*");
+	}
+	
+	@Override
+	protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		Map<String, String> res = new HashMap<>();
 		req.setCharacterEncoding("utf-8");
 		String[] uris = req.getRequestURI().split("/");
@@ -129,8 +139,9 @@ public class DetailController extends HttpServlet {
 		try(
 			InputStream is = req.getInputStream();
 			InputStreamReader isr = new InputStreamReader(is);
-			BufferedReader br = new BufferedReader(isr);		
+			BufferedReader br = new BufferedReader(isr);
 		){
+			
 			String msg = "";
 			String temp = "";
 			while(true) {
@@ -164,6 +175,6 @@ public class DetailController extends HttpServlet {
 				resp.setStatus(resp.SC_BAD_REQUEST);
 				e.printStackTrace();
 			}
-		}	
+		}
 	}
 }
